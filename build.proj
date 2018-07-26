@@ -9,6 +9,8 @@
     <IntermediateOutputPath>.nuget\</IntermediateOutputPath>
     <GitInfoReportImportance>high</GitInfoReportImportance>
     <GitSkipCache>true</GitSkipCache>
+    <GitIgnoreBranchVersion>true</GitIgnoreBranchVersion>
+    <GitIgnoreTagVersion>true</GitIgnoreTagVersion>
     <DefaultImportance Condition=" '$(DefaultImportance)' == '' ">high</DefaultImportance>
   </PropertyGroup>
 
