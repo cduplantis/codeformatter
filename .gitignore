@@ -21,6 +21,7 @@ tools/
 [Bb]in/
 [Oo]bj/
 msbuild.log
+.nuget/
 
 # Roslyn stuff
 *.sln.ide

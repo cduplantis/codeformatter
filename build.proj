@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="CoreBuild/1.0.0-beta" InitialTargets="_Init">
+
+  <PropertyGroup Label="Build">
+    <IsCI>false</IsCI>
+    <IsCI Condition="'$(TF_BUILD)' == 'true'">true</IsCI>
+    <Configuration Condition="'$(Configuration)' == '' And '$(IsCI)' != 'true'">Debug</Configuration>
+    <Configuration Condition="'$(Configuration)' == '' And '$(IsCI)' == 'true'">Release</Configuration>
+    <IntermediateOutputPath>.nuget\</IntermediateOutputPath>
+    <GitInfoReportImportance>high</GitInfoReportImportance>
+    <GitSkipCache>true</GitSkipCache>
+    <DefaultImportance Condition=" '$(DefaultImportance)' == '' ">high</DefaultImportance>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Packaging">
+    <IsPackagingProject>true</IsPackagingProject>
+    <PackOnBuild>true</PackOnBuild>
+    <InferPackageContents>false</InferPackageContents>
+    <PackageOutputPath Condition="'$(PackageOutputPath)' == ''">$(MSBuildThisFileDirectory)bin</PackageOutputPath>
+
+    <PackageId>Xamarin.CodeFormatter</PackageId>
+		<Authors>Xamarin</Authors>
+		<Owners>$(Authors)</Owners>
+    <Copyright>Copyright 2018 © Xamarin</Copyright>
+
+    <Title>Xamarin.CodeFormatter</Title>
+    <Description>Tool that uses Roslyn to automatically rewrite the source to follow our coding styles.</Description>
+    <Summary>$(Description)</Summary>
+    <PackageProjectUrl>https://github.com/dotnet/codeformatter</PackageProjectUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Solution Include="src\CodeFormatter.sln" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageFile Include="src\build\Xamarin.CodeFormatter.*" Kind="Build" />
+    <PackageFile Include="bin\CodeFormatter\$(Configuration)\*.*" Kind="Tools" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="GitInfo" Version="2.0.11"/>
+    <PackageReference Include="NuGet.Build.Packaging" Version="0.2.2"/>
+    <PackageReference Include="Sleet.Azure" Version="0.2.5" />
+    <PackageReference Include="MSBuilder.CI" Version="0.1.2" />
+  </ItemGroup>
+
+  <Target Name="All" DependsOnTargets="Build;Package" />
+
+  <Target Name="Configure" DependsOnTargets="Restore">
+    <MSBuild Projects="@(Solution)" Targets="Restore" />
+  </Target>
+
+  <Target Name="Build" DependsOnTargets="$(BuildDependsOn)">
+    <MSBuild Projects="@(Solution)" Targets="Build" />
+  </Target>
+
+  <Target Name="_AfterPack" Condition="'$(CI)' != 'true'" AfterTargets="Pack">
+    <Exec Command='rd "$(NuGetPackageRoot)$(PackageId.ToLowerInvariant())" /q /s' Condition="Exists('$(NuGetPackageRoot)$(PackageId.ToLowerInvariant())')" />
+
+    <ItemGroup>
+      <_TempPackages Include="$(TEMP)\packages\$(PackageId)*.nupkg" />
+    </ItemGroup>
+    <Delete Files="@(_TempPackages)" />
+
+    <Copy SourceFiles="$(PackageTargetPath)" DestinationFolder="$(TEMP)\packages" />
+  </Target>
+
+  <Target Name="_BeforePack" BeforeTargets="Pack" DependsOnTargets="_GetVersion">
+    <Message Importance="high" Text="Building version $(Version)" />
+    <Message Text="##vso[build.updatebuildnumber]$(Version)+$(GitCommit).$(BUILD_BUILDID)" Importance="high" Condition="'$(TF_BUILD)' == 'true'" />
+
+    <ItemGroup>
+      <_OldOutput Include="$(PackageOutputPath)\*.*" Exclude="$(PackageOutputPath)\*.binlog" />
+    </ItemGroup>
+    <Delete Files="@(_OldOutput)" />
+  </Target>
+
+  <Target Name="_BeforePush" BeforeTargets="Push">
+    <ItemGroup>
+      <Package Include="$(PackageOutputPath)\*.nupkg" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="_GetVersion" BeforeTargets="Build;Pack;GetPackageVersion" DependsOnTargets="GitVersion" Returns="$(Version)">
+    <PropertyGroup>
+      <!-- Our version is always the base version, with different pre-release labels for non-baseline builds -->
+      <VersionPrefix Condition="'$(VersionPrefix)' == ''">$(GitSemVerMajor).$(GitSemVerMinor).$(GitSemVerPatch)</VersionPrefix>
+      <!-- PR builds are *always* prerelease -->
+      <VersionSuffix Condition="'$(GitBranch)' == 'undefined'">-pr</VersionSuffix>
+      <VersionSuffix Condition="'$(SYSTEM_PULLREQUEST_PULLREQUESTNUMBER)' != ''">-pr$(SYSTEM_PULLREQUEST_PULLREQUESTNUMBER)</VersionSuffix>
+      <!-- If still no suffix was determined, default it to the optional semver label suffix -->
+      <VersionSuffix Condition="'$(VersionSuffix)' == ''">$(GitSemVerDashLabel)</VersionSuffix>
+
+      <!-- Finally, we'll use the branch name as a pre-release label unless it's master -->
+      <VersionSuffix Condition="'$(SYSTEM_PULLREQUEST_PULLREQUESTNUMBER)' == '' and 
+									  '$(BUILD_SOURCEBRANCHNAME)' != '' and 
+									  '$(BUILD_SOURCEBRANCHNAME)' != 'master'">$(GitSemVerDashLabel)-$(BUILD_SOURCEBRANCHNAME)</VersionSuffix>
+
+      <!-- Finally make up the version -->
+      <Version>$(VersionPrefix)$(VersionSuffix)</Version>
+      <PackageVersion>$(Version)</PackageVersion>
+      <InformationalVersion Condition="'$(InformationalVersion)' == ''">$(Version)-$(GitBranch)+$(GitCommit)</InformationalVersion>
+    </PropertyGroup>
+  </Target>
+
+	<Target Name="_SetGitBranch" AfterTargets="GitInfo" Condition="'$(CI)' == 'true'">
+		<PropertyGroup>
+			<!-- Adjust branch name to CI provided value if available -->
+			<GitBranch Condition="'$(SYSTEM_PULLREQUEST_TARGETBRANCH)' != ''">$(SYSTEM_PULLREQUEST_TARGETBRANCH)</GitBranch>
+			<GitBranch Condition="'$(SYSTEM_PULLREQUEST_TARGETBRANCH)' == '' and '$(BUILD_SOURCEBRANCHNAME)' != ''">$(BUILD_SOURCEBRANCHNAME)</GitBranch>
+		</PropertyGroup>
+	</Target>
+
+  <Target Name="_Init">
+    <MakeDir Directories="$(PackageOutputPath)" Condition="!Exists('$(PackageOutputPath)')" />
+    <MakeDir Directories="$(TEMP)\packages" Condition="!Exists('$(TEMP)\packages')" />
+  </Target>
+
+</Project>
