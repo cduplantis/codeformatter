@@ -30,6 +30,7 @@ namespace CodeFormatter
             true,
             null,
             null,
+            null,
             allowTables: false,
             verbose: false);
 
@@ -41,6 +42,7 @@ namespace CodeFormatter
             ImmutableArray<string>.Empty,
             ImmutableArray<string>.Empty,
             true,
+            null,
             null,
             null,
             allowTables: false,
@@ -55,6 +57,7 @@ namespace CodeFormatter
         public readonly ImmutableArray<string> FileNames;
         public readonly bool UseEditorConfig;
         public readonly string AdditionalFileItemNames;
+        public readonly string MsBuildPath;
         public readonly string Language;
         public readonly bool AllowTables;
         public readonly bool Verbose;
@@ -68,6 +71,7 @@ namespace CodeFormatter
             ImmutableArray<string> fileNames,
             bool useEditorConfig,
             string additionalFileItemNames,
+            string msBuildPath,
             string language,
             bool allowTables,
             bool verbose)
@@ -80,6 +84,7 @@ namespace CodeFormatter
             FormatTargets = formatTargets;
             UseEditorConfig = useEditorConfig;
             AdditionalFileItemNames = additionalFileItemNames;
+            MsBuildPath = msBuildPath;
             Language = language;
             AllowTables = allowTables;
             Verbose = verbose;
@@ -146,10 +151,12 @@ namespace CodeFormatter
         private const string RuleEnabledSwitch2 = "/rule:";
         private const string RuleDisabledSwitch = "/rule-:";
         private const string AdditionalFileItenNamesSwitch = "/additionalFileItemNames:";
+        private const string MsBuildPathSwitch = "/msBuildPath:";
         private const string Usage =
 @"CodeFormatter [/file:<filename>] [/lang:<language>] [/c:<config>[,<config>...]>]
     [/copyright(+|-):[<file>]] [/tables] [/nounicode] [/noEditorConfig]
-    [/additionalFileItemNames:<itemNames>] [/rule(+|-):rule1,rule2,...]  [/verbose]
+    [/additionalFileItemNames:<itemNames>] [/rule(+|-):rule1,rule2,...]
+    [/msBuildPath:<msBuildBinPath>] [/verbose]
     <project, solution or response file>
 
     /file                    - Only apply changes to files with specified name
@@ -169,6 +176,7 @@ namespace CodeFormatter
     /noEditorConfig          - Do not use the .editorConfig file to configure the formatting options
     /rule(+|-)               - Enable (default) or disable the specified rule
     /rules                   - List the available rules
+    /msBuildPath             - Specifies the MS Build bin path used by the formatter 
     /verbose                 - Verbose output
     /help                    - Displays this usage message (short form: /?)
 ";
@@ -199,6 +207,7 @@ namespace CodeFormatter
             var verbose = false;
             var useEditorConfig = true;
             var additionalFileItemNames = default(string);
+            var msBuildPath = default(string);
 
             foreach (var rule in FormattingEngine.GetFormattingRules())
                 UpdateRuleMap(ref ruleMap, rule.Name, rule.IsDefaultEnabled);
@@ -247,6 +256,10 @@ namespace CodeFormatter
                 else if (arg.StartsWith(AdditionalFileItenNamesSwitch, comparison))
                 {
                     additionalFileItemNames = arg.Substring(AdditionalFileItenNamesSwitch.Length);
+                }
+                else if (arg.StartsWith(MsBuildPathSwitch, comparison))
+                {
+                    msBuildPath = arg.Substring(MsBuildPathSwitch.Length).Trim('"');
                 }
                 else if (arg.StartsWith(LanguageSwitch, comparison))
                 {
@@ -312,6 +325,7 @@ namespace CodeFormatter
                 fileNames.ToImmutableArray(),
                 useEditorConfig,
                 additionalFileItemNames,
+                msBuildPath,
                 language,
                 allowTables,
                 verbose);

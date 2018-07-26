@@ -40,7 +40,7 @@ namespace Microsoft.DotNet.DeadRegionAnalysis
             {
                 if (projectPaths != null)
                 {
-                    projects = Task.WhenAll(from path in projectPaths select MSBuildWorkspace.Create().OpenProjectAsync(path, CancellationToken.None)).Result;
+                    projects = Task.WhenAll(from path in projectPaths select MSBuildWorkspace.Create().OpenProjectAsync(path, cancellationToken: CancellationToken.None)).Result;
                 }
                 if (projects != null)
                 {

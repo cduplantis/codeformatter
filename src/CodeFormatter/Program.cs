@@ -12,13 +12,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using EditorConfig.Core;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Formatting;
-using Microsoft.CodeAnalysis.Host;
-using Microsoft.CodeAnalysis.MSBuild;
-using Microsoft.CodeAnalysis.Options;
 using Microsoft.DotNet.CodeFormatting;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Microsoft.Build.Locator;
+using Microsoft.CodeAnalysis.MSBuild;
 
 namespace CodeFormatter
 {
@@ -33,6 +31,20 @@ namespace CodeFormatter
                 CommandLineParser.PrintUsage();
                 return -1;
             }
+
+            string msBuildPath;
+            if (!string.IsNullOrEmpty(result.Options.MsBuildPath))
+            {
+                msBuildPath = result.Options.MsBuildPath;
+                MSBuildLocator.RegisterMSBuildPath(msBuildPath);
+            }
+            else
+            {
+                var vsInstance = MSBuildLocator.RegisterDefaults();
+                msBuildPath = vsInstance.MSBuildPath;
+            }
+
+            Console.WriteLine("Using MsBuild from: {0}", msBuildPath);
 
             var options = result.Options;
             int exitCode;
@@ -136,7 +148,7 @@ namespace CodeFormatter
                 using (var workspace = CreateMSBuildWorkspace(options))
                 {
                     workspace.LoadMetadataForReferencedProjects = true;
-                    var solution = await workspace.OpenSolutionAsync(item, cancellationToken);
+                    var solution = await workspace.OpenSolutionAsync(item, cancellationToken: cancellationToken);
                     await engine.FormatSolutionAsync(solution, cancellationToken);
                 }
             }
@@ -145,7 +157,7 @@ namespace CodeFormatter
                 using (var workspace = CreateMSBuildWorkspace(options))
                 {
                     workspace.LoadMetadataForReferencedProjects = true;
-                    var project = await workspace.OpenProjectAsync(item, cancellationToken);
+                    var project = await workspace.OpenProjectAsync(item, cancellationToken: cancellationToken);
                     await engine.FormatProjectAsync(project, cancellationToken);
                 }
             }

@@ -7,6 +7,7 @@
     <RootNamespace>DeadRegions</RootNamespace>
     <AssemblyName>DeadRegions</AssemblyName>
     <IncludeRoslyn>true</IncludeRoslyn>
+    <IncludeMsBuildWorkspace>true</IncludeMsBuildWorkspace>
   </PropertyGroup>
   <Import Project="..\..\build.props" />
   <!-- Default configurations to help VS understand -->

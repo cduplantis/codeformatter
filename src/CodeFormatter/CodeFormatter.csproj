@@ -8,6 +8,7 @@
     <AssemblyName>CodeFormatter</AssemblyName>
     <IncludeRoslyn>true</IncludeRoslyn>
     <IncludeMSBuild>true</IncludeMSBuild>
+    <IncludeMsBuildWorkspace>true</IncludeMsBuildWorkspace>
   </PropertyGroup>
   <Import Project="..\..\build.props" />
   <!-- Default configurations to help VS understand -->
