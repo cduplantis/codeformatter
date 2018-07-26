@@ -37,7 +37,7 @@
   
   <ItemGroup>
     <PackageFile Include="src\build\Xamarin.CodeFormatter.*" Kind="Build" />
-    <PackageFile Include="bin\CodeFormatter\$(Configuration)\*.*" Kind="Tools" />
+    <PackageFile Include="src\CodeFormatter\bin\$(Configuration)\net461\*.*" Kind="Tools" />
   </ItemGroup>
 
   <ItemGroup>

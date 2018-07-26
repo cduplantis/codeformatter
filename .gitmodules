@@ -1,0 +1,3 @@
+[submodule "external/editorconfig-core-net"]
+	path = external/editorconfig-core-net
+	url = https://github.com/adalon/editorconfig-core-net.git

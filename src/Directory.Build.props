@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project>
+	<PropertyGroup>
+		<Authors>Xamarin</Authors>
+		<Owners>Xamarin</Owners>
+		<Copyright>Copyright 2018 © Mobile Essentials</Copyright>
+
+		<PackageProjectUrl>https://github.com/xamarin/codeformatter</PackageProjectUrl>
+		<PackageLicenseUrl>https://github.com/xamarin/codeformatter/blob/master/LICENSE</PackageLicenseUrl>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+
+		<DefaultItemExcludes>$(DefaultItemExcludes);**/*.binlog</DefaultItemExcludes>
+
+		<CI Condition="'$(TF_BUILD)' == 'true' or '$(APPVEYOR)' != ''">true</CI>
+	</PropertyGroup>
+</Project>

@@ -1,73 +1,25 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <ProjectGuid>{D535641F-A2D7-481C-930D-96C02F052B95}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Microsoft.DotNet.CodeFormatting</RootNamespace>
-    <AssemblyName>Microsoft.DotNet.CodeFormatting</AssemblyName>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup>
     <IncludeRoslyn>true</IncludeRoslyn>
     <IncludeEditorConfig>true</IncludeEditorConfig>
   </PropertyGroup>
-  <Import Project="..\..\build.props" />
-  <!-- Default configurations to help VS understand -->
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' " />
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' " />
+
+  <PropertyGroup>
+    <Company>Microsoft Corporation</Company>
+    <Copyright>\x00a9 Microsoft Corporation.  All rights reserved.</Copyright>
+  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
   </ItemGroup>
+  
   <ItemGroup>
-    <Compile Include="ConfiguredAdditionalDocument.cs" />
-    <Compile Include="ConfiguredDocument.cs" />
-    <Compile Include="IEditorConfigProvider.cs" />
-    <Compile Include="NameHelper.cs" />
-    <Compile Include="ResponseFileWorkspace.cs" />
-    <Compile Include="Rules\FormatXmlDocumentRule.cs" />
-    <Compile Include="Rules\MarkReadonlyFieldsRule.cs" />
-    <Compile Include="SemaphoreLock.cs" />
-    <Compile Include="SyntaxUtil.cs" />
-    <Compile Include="Filters\FilenameFilter.cs" />
-    <Compile Include="Filters\UsableFileFilter.cs" />
-    <Compile Include="FormattingDefaults.cs" />
-    <Compile Include="FormattingEngine.cs" />
-    <Compile Include="FormattingEngineImplementation.cs" />
-    <Compile Include="IFormatLogger.cs" />
-    <Compile Include="IFormattingEngine.cs" />
-    <Compile Include="IFormattingFilter.cs" />
-    <Compile Include="IFormattingRule.cs" />
-    <Compile Include="Filters\IgnoreGeneratedFilesFilter.cs" />
-    <Compile Include="Options.cs" />
-    <Compile Include="RuleAttribute.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="IRuleMetadata.cs" />
-    <Compile Include="Rules\ExplicitVisibilityRule.CSharp.cs" />
-    <Compile Include="Rules\ExplicitVisibilityRule.VisualBasic.cs" />
-    <Compile Include="Rules\PrivateFieldNamingRule.CSharp.cs" />
-    <Compile Include="Rules\PrivateFieldNamingRule.VisualBasic.cs" />
-    <Compile Include="Rules\SyntaxFormattingRule.cs" />
-    <Compile Include="Rules\CopyrightHeaderRule.VisualBasic.cs" />
-    <Compile Include="Rules\CopyrightHeaderRule.CSharp.cs" />
-    <Compile Include="Rules\CSharpOnlyFormattingRule.cs" />
-    <Compile Include="Rules\ExplicitVisibilityRule.cs" />
-    <Compile Include="Rules\CopyrightHeaderRule.cs" />
-    <Compile Include="Rules\HasNoIllegalHeadersFormattingRule.cs" />
-    <Compile Include="Rules\HasNoCustomCopyrightHeaderFormattingRule.cs" />
-    <Compile Include="Rules\PrivateFieldNamingRule.cs" />
-    <Compile Include="Rules\UsingLocationRule.cs" />
-    <Compile Include="Rules\FormatDocumentFormattingRule.cs" />
-    <Compile Include="Rules\NonAsciiCharactersAreEscapedInLiteralsRule.cs" />
-    <Compile Include="Rules\ExplicitThisRule.cs" />
-    <Compile Include="Rules\RuleOrder.cs" />
-    <Compile Include="System\Dynamic\DynamicReflection.cs" />
-    <Compile Include="System\Dynamic\OutValue.cs" />
-    <Compile Include="System\Dynamic\RefValue.cs" />
-    <Compile Include="System\Dynamic\TypeParameter.cs" />
+    <ProjectReference Include="..\..\external\editorconfig-core-net\src\EditorConfig.Core\EditorConfig.Core.csproj" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+
 </Project>

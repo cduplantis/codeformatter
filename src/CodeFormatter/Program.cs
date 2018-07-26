@@ -135,15 +135,7 @@ namespace CodeFormatter
         {
             Console.WriteLine(Path.GetFileName(item));
             string extension = Path.GetExtension(item);
-            if (StringComparer.OrdinalIgnoreCase.Equals(extension, ".rsp"))
-            {
-                using (var workspace = ResponseFileWorkspace.Create())
-                {
-                    Project project = workspace.OpenCommandLineProject(item, options.Language);
-                    await engine.FormatProjectAsync(project, cancellationToken);
-                }
-            }
-            else if (StringComparer.OrdinalIgnoreCase.Equals(extension, ".sln"))
+            if (StringComparer.OrdinalIgnoreCase.Equals(extension, ".sln"))
             {
                 using (var workspace = CreateMSBuildWorkspace(options))
                 {
