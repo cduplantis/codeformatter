@@ -1,6 +1,6 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-  <Target Name="FormatSourceCode">
+  <Target Name="FormatDocuments">
     <Exec Command="$(CodeFormatterTool) $(CodeFormatterToolArgs) %(CodeFormatterSolution.Identity)" />
   </Target>
 
